@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Lg72cu.GitHub.io : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Lg72cu.GitHub.io</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lg72cu">View on GitHub</a>
+
+          <h1 id="project_title">Lg72cu.GitHub.io</h1>
+          <h2 id="project_tagline"></h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>&lt;!DOCTYPE html&gt;</p>
+
+<p></p>
+
+<p></p>
+
+<p>
+
+</p>
+
+<p></p>
+
+
+
+<p>
+
+</p>
+
+
+
+code{white-space: pre;}
+
+<p></p>
+
+
+
+
+  pre:not([class]) {
+    background-color: white;
+  }
+
+
+
+
+<p></p>
+
+<p></p>
+
+
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+<div>
+
+
+
+
+<div id="machine-learnign-on-quality-of-barbell-lifts">
+<h1>
+<a id="machine-learnign-on-quality-of-barbell-lifts" class="anchor" href="#machine-learnign-on-quality-of-barbell-lifts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Machine learnign on quality of barbell lifts</h1>
+<div id="background">
+<h2>
+<a id="background" class="anchor" href="#background" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background</h2>
+<p>In this project we used a weight lifting exercise dataset obtained from <a href="http://groupware.les.inf.puc-rio.br/har.The">http://groupware.les.inf.puc-rio.br/har.The</a> data set contain information recorded on accelerometers on the belt, forearm, arm, and dumbbell of 6 participants who were asked to perform barbell lifts correctly and incorrectly in 5 different ways: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E). The goal is to use this data to build algorithms to predict if the barbell lifts are performed correctly and if incorrectly in which ways with accelerometers records.</p>
+</div>
+
+<div id="read-the-data">
+<h2>
+<a id="read-the-data" class="anchor" href="#read-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read the data</h2>
+<p>Training and testing data set were downloaded from Coursera website.</p>
+<pre><code>train&lt;-read.csv("C:/Users/lina/Desktop/coursera/machineLearning/pml-training.csv")
+test&lt;-read.csv("C:/Users/lina/Desktop/coursera/machineLearning/pml-testing.csv")</code></pre>
+</div>
+
+<div id="cleaning-data">
+<h2>
+<a id="cleaning-data" class="anchor" href="#cleaning-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cleaning data</h2>
+<p>The data set contain 160 variables. The dependent variable is â€œclasseâ€ and the other 159 are potential explanary variables. We removed variables that will not proveide infomation on prediction of the dependent variable in the following steps.</p>
+<div id="remove-near-zero-variables">
+<h3>
+<a id="remove-near-zero-variables" class="anchor" href="#remove-near-zero-variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>remove near zero variables</h3>
+<pre><code>library(caret)</code></pre>
+<pre><code>## Loading required package: lattice
+## Loading required package: ggplot2</code></pre>
+<pre><code>nsv &lt;- nearZeroVar(train,saveMetrics=TRUE)
+train1&lt;-train[,!nsv$nzv]</code></pre>
+</div>
+
+<div id="remove-first-7-variables">
+<h3>
+<a id="remove-first-7-variables" class="anchor" href="#remove-first-7-variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>remove first 7 variables</h3>
+<p>These variables contain information such as participant name, date and time, which are not useful in prediction.</p>
+<pre><code>train2&lt;-train1[,-(1:7)]</code></pre>
+</div>
+
+<div id="remove-variables-that-contain-more-than-half-na-values">
+<h3>
+<a id="remove-variables-that-contain-more-than-half-na-values" class="anchor" href="#remove-variables-that-contain-more-than-half-na-values" aria-hidden="true"><span class="octicon octicon-link"></span></a>remove variables that contain more than half na values</h3>
+<pre><code>navar&lt;-function(colu) {mean(is.na(colu))}
+naper&lt;-sapply(train2,navar)
+train3&lt;-train2[,!(naper&gt;0.5)]</code></pre>
+<p>The remaining variables do not contain any na values.</p>
+<pre><code>mean(is.na(train3))</code></pre>
+<pre><code>## [1] 0</code></pre>
+</div>
+
+<p></p>
+</div>
+
+<div id="model-building-and-cross-validation">
+<h2>
+<a id="model-building-and-cross-validation" class="anchor" href="#model-building-and-cross-validation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model building and cross validation</h2>
+<p>Inspection of the variables remained in the dataset after cleaning found that many variables are highly scewed.Also many variables are highly correlated. If using ordinary regression, we would need to pre-process the variables heavily. Also considering the outcome variable is a class variable with 5 levels, random forest seems an appropriate algorithm for prediction.</p>
+<p>Another advantage of using random forest is the algorithm performs cross validation behind the scenes and estimate OOB error rate. cited from the original implementation (â€œ<a href="http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr">http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr</a>â€) of the random forest package:</p>
+<p>â€œIn random forests, there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, during the run, as follows:</p>
+<p>Each tree is constructed using a different bootstrap sample from the original data. About one-third of the cases are left out of the bootstrap sample and not used in the construction of the kth tree.</p>
+<p>Put each case left out in the construction of the kth tree down the kth tree to get a classification. In this way, a test set classification is obtained for each case in about one-third of the trees. At the end of the run, take j to be the class that got most of the votes every time case n was oob. The proportion of times that j is not equal to the true class of n averaged over all cases is the oob error estimate. This has proven to be unbiased in many tests. "</p>
+<pre><code>library("randomForest")</code></pre>
+<pre><code>## randomForest 4.6-10
+## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>fitrf&lt;-randomForest(classe~ .,data=train3)
+fitrf</code></pre>
+<pre><code>## 
+## Call:
+##  randomForest(formula = classe ~ ., data = train3) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 7
+## 
+##         OOB estimate of  error rate: 0.3%
+## Confusion matrix:
+##      A    B    C    D    E  class.error
+## A 5578    2    0    0    0 0.0003584229
+## B    9 3786    2    0    0 0.0028970240
+## C    0   14 3407    1    0 0.0043834015
+## D    0    0   21 3193    2 0.0071517413
+## E    0    0    1    6 3600 0.0019406709</code></pre>
+<p>The OOB estimate of error rate is 0.3%.</p>
+</div>
+
+<div id="prediction-with-testing-set">
+<h2>
+<a id="prediction-with-testing-set" class="anchor" href="#prediction-with-testing-set" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prediction with testing set</h2>
+<pre><code>pred &lt;- predict(fitrf,test)
+pred</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
+</div>
+
+<p></p>
+</div>
+
+<p></p>
+</div>
+
+
+
+
+
+
+
+<p>
+</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
